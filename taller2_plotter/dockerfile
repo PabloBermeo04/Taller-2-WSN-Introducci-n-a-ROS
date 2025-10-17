@@ -1,0 +1,50 @@
+#============================================
+#            PASO NUMERO UNO
+#============================================
+# Obtener la imagen base de ROS
+FROM osrf/ros:jazzy-desktop
+
+# Copiar archivos locales desde Windows
+COPY ./toros /toros
+
+# Actualizar el sistema operativo
+RUN apt update && apt upgrade -y
+
+# Instalar herramientas de compilación y utilidades
+RUN apt install -y python3-colcon-common-extensions nano bash
+RUN apt install -y python3-colcon-common-extensions nano bash python3-matplotlib
+
+#============================================
+#            PASO NUMERO DOS
+#============================================
+# Crear el workspace de ROS2
+RUN mkdir -p /root/ros2_ws/src
+WORKDIR /root/ros2_ws/src
+
+#============================================
+#            PASO NUMERO TRES
+#============================================
+# Crear el paquete ROS2
+RUN /bin/bash -c "source /opt/ros/jazzy/setup.bash && ros2 pkg create --build-type ament_python sensor_program --license MIT"
+
+#==============================================
+#      PASO NUMERO CUATRO, CINCO, SEIS
+#==============================================
+# Copiar los archivos de nodos y setup.py
+RUN cp /toros/setup.py /root/ros2_ws/src/sensor_program/setup.py
+RUN cp /toros/sensor_node.py /root/ros2_ws/src/sensor_program/sensor_program/sensor_node.py
+RUN cp /toros/reader_node.py /root/ros2_ws/src/sensor_program/sensor_program/reader_node.py
+RUN cp /toros/plotter_node.py /root/ros2_ws/src/sensor_program/sensor_program/plotter_node.py
+#==============================================
+#               PASO SIETE
+#==============================================
+WORKDIR /root/ros2_ws
+
+# Compilar el workspace
+RUN /bin/bash -c "source /opt/ros/jazzy/setup.bash && colcon build"
+
+#==============================================
+#               PASO OCHO
+#==============================================
+ENTRYPOINT ["/bin/bash", "-c", "source /opt/ros/jazzy/setup.bash && source /root/ros2_ws/install/setup.bash && ros2 run sensor_program sensor_node"]
+
