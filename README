@@ -1,0 +1,54 @@
+Se presentan dos directorios:
+
+taller2_parte 1:
+
+	-Es la primera parte del taller y contiene un dockerfile que genera una imagen de un sistema operativo ROS
+	-La imagen ejecuta de manera automática un nodo sensor que publica su temperatura
+	-En la imagen se halla también el nodo reader_node. El nodo reader_node se subscribe al sensor y lee el valor.
+	
+	NOTAS  PARA EL FUNCIONAMIENTO CORRECTO DEL DOCKERFILE
+	-Ubique el dockerfile y la carpeta toros en un mismo directorio.
+	-En su terminal (de docker desktop, WSL o Poweshell) ubíquese en la dirección del directorio anterior.
+	-Solo entonces ejecute la instrucción "docker build -t p1 ."
+	-Una vez hecho esto, tendrá la imagen funcionando. 
+	-Cree un contenedor con la orden "docker create -it p1cont p1".
+	-Lance el contenedor con "docker start -ai p1cont". Debe visualizar la publicación de temperatura de forma automática.
+	-Para ejecutar el lector (reader_node) abra una nueva terminal y ejecute "docker exec -it p1cont bash"
+	-Dentro del contenedor invoque el entorno de ros 2 con "source /opt/ros/jazzy/setup.bash && source install/setup.bash"
+	-Para el segundo comando, usted debe hallarse en la dirección "~/ros2_ws". 
+	-La imagen hace que usted se ubique de manera instantánea en la dirección de antes.
+	-Ejecute el lector con "ros2 run sensor_program reader_node"
+	-Finalmente, verá el sensor y el lector actuando simultáneamente.
+
+
+
+
+taller2_plotter:
+
+	-Es el reto del taller y contiene un dockerfile que genera una imagen de un sistema operativo ROS
+	-La imagen ejecuta de manera automática un nodo sensor que publica su temperatura
+	-En la imagen se halla también el nodo reader_node y un plotter_node. El nodo reader_node se subscribe al sensor y lee el valor. El nodo plotter gráfica las últimas 30 mediciones
+	 del sensor y las gráfica con python.
+	-El nodo plotter guarda la gráfica en una carpeta compartida "/graphs". En tanto se deberá crear un volumen que se comunique con ese directorio para que el guest pueda ver las gráficas.
+
+	NOTAS  PARA EL FUNCIONAMIENTO CORRECTO DEL DOCKERFILE
+	-Ubique el dockerfile y la carpeta toros en un mismo directorio.
+	-En ese directorio cree una carpeta denominada "graphs".
+	-En su terminal (de docker desktop, WSL o Poweshell) ubíquese en la dirección del directorio anterior.
+	-Solo entonces ejecute la instrucción "docker build -t p1 ."
+	-Una vez hecho esto, tendrá la imagen funcionando. 
+
+	-Cree un contenedor con la orden "docker create -it p1cont -v ./graphs:/graphs p1".
+	-Lance el contenedor con "docker start -ai p1cont". Debe visualizar la publicación de temperatura de forma automática.
+	-Para ejecutar el lector (reader_node) abra una nueva terminal y ejecute "docker exec -it p1cont bash"
+	-Dentro del contenedor invoque el entorno de ros 2 con "source /opt/ros/jazzy/setup.bash && source install/setup.bash"
+	-Ejecute el lector con "ros2 run sensor_program reader_node"
+
+	-Para ejecutar el plotter (plotter_node) abra una nueva terminal y ejecute "docker exec -it p1cont bash"
+	-Dentro del contenedor invoque el entorno de ros 2 con "source /opt/ros/jazzy/setup.bash && source install/setup.bash"
+	-Para el segundo comando, usted debe hallarse en la dirección "~/ros2_ws". 
+	-La imagen hace que usted se ubique de manera instantánea en la dirección de antes.
+	-Ejecute el plotter con "ros2 run plotter_program reader_node"
+	-Finalmente, verá el sensor y el lector actuando simultáneamente.
+	-Una vez se halle ejecutando el plotter, vaya a su carpeta graphs en su máquina host y allí verá una imagen que se actualiza cada 5 segundos. Esa imagen proviene del plotter.
+
